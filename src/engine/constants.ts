@@ -14,11 +14,12 @@ export const MAX_RIVER_WIDTH_CELLS = 9;
 
 export const FIRE_INITIAL_INTENSITY = 100;
 export const FIRE_SPREAD_INTERVAL_MS = 1_500;
+export const MAX_FIRE_SPREADS_PER_UPDATE = 8;
 export const MAX_FIRE_CELLS = GRID_CELL_COUNT;
 
 export const TSUNAMI_WIDTH = 220;
 export const TSUNAMI_SPEED = 42;
-export const TSUNAMI_LIFETIME_MS = 24_000;
+export const TSUNAMI_LIFETIME_MS = 8_000;
 
 export const BANDIT_COUNT = 4;
 export const BANDIT_PATH_INTERVAL_MS = 1_000;
