@@ -144,6 +144,24 @@ describe("findPath", () => {
     ]);
   });
 
+  it("routes around circular blocked areas", () => {
+    const world = allLandWorld();
+    const path = findPath(
+      world,
+      cellToWorld({ x: 1, y: 10 }),
+      cellToWorld({ x: 9, y: 10 }),
+      512,
+      [{ center: { x: 55, y: 105 }, radius: 14 }],
+    );
+
+    expect(path).not.toBeNull();
+    expect(path).not.toEqual([
+      cellToWorld({ x: 1, y: 10 }),
+      cellToWorld({ x: 9, y: 10 }),
+    ]);
+    expect(path!.some((point) => Math.hypot(point.x - 55, point.y - 105) <= 14)).toBe(false);
+  });
+
   it("hard-caps an oversized search request at 4096 visited cells", () => {
     const world = allLandWorld();
     world.terrain.fill(TERRAIN_WATER);

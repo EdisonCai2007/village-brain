@@ -14,6 +14,11 @@ import {
 } from "./geometry";
 import type { Cell, Point, WorldState } from "./types";
 
+export interface BlockedArea {
+  center: Point;
+  radius: number;
+}
+
 export const replaceBridgeCells = (world: WorldState, cells: readonly Cell[]): void => {
   const replacement = new Uint8Array(GRID_CELL_COUNT);
   for (const cell of cells.slice(0, MAX_SEARCH_CELLS)) {
@@ -85,8 +90,18 @@ class MinHeap {
 const manhattan = (from: Cell, to: Cell): number =>
   Math.abs(from.x - to.x) + Math.abs(from.y - to.y);
 
-const isTraversable = (world: WorldState, index: number): boolean =>
-  world.terrain[index] === TERRAIN_LAND || world.bridgeCells[index] === 1;
+const isTraversable = (
+  world: WorldState,
+  index: number,
+  blockedAreas: readonly BlockedArea[],
+): boolean => {
+  if (world.terrain[index] !== TERRAIN_LAND && world.bridgeCells[index] !== 1) return false;
+  const point = cellToWorld(indexToCell(index));
+  return !blockedAreas.some((area) =>
+    Number.isFinite(area.radius)
+    && area.radius >= 0
+    && Math.hypot(point.x - area.center.x, point.y - area.center.y) <= area.radius);
+};
 
 const crossesActiveWall = (world: WorldState, from: Cell, to: Cell): boolean => {
   const wall = world.activeVillage?.wall;
@@ -131,6 +146,7 @@ export const findPath = (
   from: Point,
   to: Point,
   maxVisited: number,
+  blockedAreas: readonly BlockedArea[] = [],
 ): Point[] | null => {
   const start = worldToCell(from);
   const destination = worldToCell(to);
@@ -145,7 +161,10 @@ export const findPath = (
   const visitLimit = Math.min(Math.floor(maxVisited), MAX_SEARCH_CELLS);
   const startIndex = cellIndex(start);
   const destinationIndex = cellIndex(destination);
-  if (!isTraversable(world, startIndex) || !isTraversable(world, destinationIndex)) return null;
+  if (
+    !isTraversable(world, startIndex, blockedAreas)
+    || !isTraversable(world, destinationIndex, blockedAreas)
+  ) return null;
 
   const frontier = new MinHeap();
   const costs = new Float64Array(GRID_CELL_COUNT);
@@ -171,7 +190,7 @@ export const findPath = (
       const neighborIndex = cellIndex(neighbor);
       if (
         closed[neighborIndex] === 1
-        || !isTraversable(world, neighborIndex)
+        || !isTraversable(world, neighborIndex, blockedAreas)
         || crossesActiveWall(world, current, neighbor)
       ) {
         continue;
