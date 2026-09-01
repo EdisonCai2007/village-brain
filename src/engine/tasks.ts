@@ -659,6 +659,17 @@ const houseHealth = (house: House): number => house.health ?? 100;
 const needsHouseRebuild = (house: House): boolean =>
   house.destroyed === true || houseHealth(house) < 100;
 
+const roadHealth = (road: Road): number => road.health ?? (road.damaged === true ? 0 : 100);
+
+const needsRoadRebuild = (road: Road): boolean =>
+  road.damaged === true || roadHealth(road) < 100;
+
+const wallSegmentHealth = (segment: WallSegment): number =>
+  segment.health ?? (segment.destroyed === true ? 0 : 100);
+
+const needsWallRebuild = (segment: WallSegment): boolean =>
+  segment.destroyed === true || wallSegmentHealth(segment) < 100;
+
 const roadWorkPoint = (road: Road): Point => {
   const start = road.points[0];
   const end = road.points.at(-1);
@@ -676,13 +687,13 @@ const recoveryTargets = (world: WorldState): RecoveryTarget[] => {
     }
   }
   for (const road of village.roads) {
-    if (road.damaged === true) {
+    if (needsRoadRebuild(road)) {
       targets.push({ id: `road:${road.id}`, kind: "road", point: roadWorkPoint(road), road });
     }
   }
   for (let index = 0; index < village.wall.segments.length; index += 1) {
     const segment = village.wall.segments[index]!;
-    if (segment.destroyed === true) {
+    if (needsWallRebuild(segment)) {
       targets.push({
         id: `wall:${index}`,
         kind: "wall",
@@ -1149,20 +1160,26 @@ const applyRebuildWork = (
     return { completed: true, spawnedVillagers, label: target.house.id };
   }
   if (target.kind === "road") {
-    target.road.rebuildProgress = progressStep(target.road.rebuildProgress, stepMs, ROAD_REBUILD_MS);
+    const baseline = target.road.rebuildProgress ?? roadHealth(target.road) / 100;
+    target.road.rebuildProgress = progressStep(baseline, stepMs, ROAD_REBUILD_MS);
+    target.road.health = Math.round(target.road.rebuildProgress * 100);
     if (target.road.rebuildProgress < 1) {
       return { completed: false, spawnedVillagers: 0, label: target.road.id };
     }
     target.road.damaged = false;
+    delete target.road.health;
     delete target.road.rebuildProgress;
     return { completed: true, spawnedVillagers: 0, label: target.road.id };
   }
   if (target.kind === "wall") {
-    target.segment.rebuildProgress = progressStep(target.segment.rebuildProgress, stepMs, WALL_REBUILD_MS);
+    const baseline = target.segment.rebuildProgress ?? wallSegmentHealth(target.segment) / 100;
+    target.segment.rebuildProgress = progressStep(baseline, stepMs, WALL_REBUILD_MS);
+    target.segment.health = Math.round(target.segment.rebuildProgress * 100);
     if (target.segment.rebuildProgress < 1) {
       return { completed: false, spawnedVillagers: 0, label: `wall segment ${target.segmentIndex + 1}` };
     }
     target.segment.destroyed = false;
+    delete target.segment.health;
     delete target.segment.rebuildProgress;
     return { completed: true, spawnedVillagers: 0, label: `wall segment ${target.segmentIndex + 1}` };
   }

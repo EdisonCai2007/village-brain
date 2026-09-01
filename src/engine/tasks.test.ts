@@ -13,7 +13,9 @@ import {
 } from "./tasks";
 import type {
   House,
+  Road,
   Villager,
+  WallSegment,
   WorldEvent,
   WorldState,
 } from "./types";
@@ -885,13 +887,13 @@ describe("deterministic task actions", () => {
   it("restores damaged paths within one second of focused rebuild work", () => {
     const world = flatWorld();
     const worker = villager("worker", 45, 45);
-    const damagedRoad = {
+    const damagedRoad: Road = {
       id: "road-1",
       role: "spine" as const,
       parentId: null,
       points: [point(5, 45), point(85, 45)],
+      health: 95,
       damaged: true,
-      rebuildProgress: 0,
     };
     world.activeVillage = {
       seed: world.seed,
@@ -919,20 +921,21 @@ describe("deterministic task actions", () => {
       createdAt: 0,
     });
 
-    for (let tick = 0; tick < 10; tick += 1) updateVillagerTasks(world, 100);
+    updateVillagerTasks(world, 100);
 
     expect(damagedRoad).toMatchObject({ damaged: false });
-    expect(damagedRoad.rebuildProgress).toBeUndefined();
+    expect(damagedRoad.health).toBeUndefined();
+    expect(damagedRoad).not.toHaveProperty("rebuildProgress");
   });
 
   it("restores destroyed wall segments within one second of focused rebuild work", () => {
     const world = flatWorld();
     const worker = villager("worker", 45, 425);
-    const destroyedSegment = {
+    const destroyedSegment: WallSegment = {
       start: { x: 45, y: 0 },
       end: { x: 45, y: 850 },
+      health: 95,
       destroyed: true,
-      rebuildProgress: 0,
     };
     world.activeVillage = {
       seed: world.seed,
@@ -964,10 +967,11 @@ describe("deterministic task actions", () => {
       createdAt: 0,
     });
 
-    for (let tick = 0; tick < 10; tick += 1) updateVillagerTasks(world, 100);
+    updateVillagerTasks(world, 100);
 
     expect(destroyedSegment).toMatchObject({ destroyed: false });
-    expect(destroyedSegment.rebuildProgress).toBeUndefined();
+    expect(destroyedSegment.health).toBeUndefined();
+    expect(destroyedSegment).not.toHaveProperty("rebuildProgress");
   });
 
   it("rebuilds stored wall gaps so the wall blocks paths again", () => {

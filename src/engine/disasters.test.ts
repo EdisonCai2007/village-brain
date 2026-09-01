@@ -344,14 +344,28 @@ describe("deterministic disaster lifecycles", () => {
 
     expect(world.activeVillage.houses[0]).toMatchObject({ health: 95, destroyed: false });
     expect(world.activeVillage.houses[1]).toMatchObject({ health: 100, destroyed: false });
-    expect(world.activeVillage.roads[0]).toMatchObject({ damaged: true, rebuildProgress: 0 });
-    expect(world.activeVillage.roads[1]).toMatchObject({ damaged: false });
-    expect(world.activeVillage.wall.segments[0]).toMatchObject({
+    expect(world.activeVillage.roads[0]).toMatchObject({
       health: 95,
-      destroyed: false,
+      damaged: true,
       rebuildProgress: expect.closeTo(0.95, 5),
     });
+    expect(world.activeVillage.roads[1]!.damaged).not.toBe(true);
+    expect(world.activeVillage.wall.segments[0]).toMatchObject({
+      health: 95,
+      rebuildProgress: expect.closeTo(0.95, 5),
+    });
+    expect(world.activeVillage.wall.segments[0]!.destroyed).not.toBe(true);
     expect(outcome.structureChanged).toBe(true);
+
+    for (let tick = 0; tick < 19; tick += 1) updateDisasters(world, 100);
+
+    expect(world.activeVillage.houses[0]).toMatchObject({ health: 0, destroyed: true });
+    expect(world.activeVillage.roads[0]).toMatchObject({ health: 0, damaged: true });
+    expect(world.activeVillage.wall.segments[0]).toMatchObject({
+      health: 0,
+      destroyed: true,
+      rebuildProgress: 0,
+    });
   });
 
   it("never lets a zero-intensity fire spread or damage and resolves without positive cells", () => {

@@ -164,6 +164,7 @@ export interface Road {
   role: RoadRole;
   parentId: string | null;
   points: Point[];
+  health?: number;
   damaged?: boolean;
   rebuildProgress?: number;
 }
@@ -255,6 +256,7 @@ export interface WallGate {
 export interface WallSegment {
   start: Point;
   end: Point;
+  health?: number;
   destroyed?: boolean;
   rebuildProgress?: number;
 }

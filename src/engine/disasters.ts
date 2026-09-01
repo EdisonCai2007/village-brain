@@ -46,8 +46,10 @@ import type {
   PlagueExposure,
   PlagueCase,
   Point,
+  Road,
   TsunamiFront,
   Villager,
+  WallSegment,
   WorldEvent,
   WorldState,
 } from "./types";
@@ -121,6 +123,9 @@ const isLivingVillager = (villager: Villager): boolean =>
 const houseHealth = (house: House): number => house.health ?? 100;
 const isStandingHouse = (house: House): boolean =>
   houseHealth(house) > 0 && house.destroyed !== true;
+const roadHealth = (road: Road): number => road.health ?? (road.damaged === true ? 0 : 100);
+const wallSegmentHealth = (segment: WallSegment): number =>
+  segment.health ?? (segment.destroyed === true ? 0 : 100);
 
 const activeEvent = (world: WorldState, eventId: string): WorldEvent | undefined =>
   world.events.find((event) => event.id === eventId && event.status === "active");
@@ -155,12 +160,32 @@ const pruneDestroyedVillageStructures = (world: WorldState): boolean => {
       road.rebuildProgress = 0;
       changed = true;
     }
+    if (road.health !== undefined && road.health <= 0) {
+      if (road.health !== 0) {
+        road.health = 0;
+        changed = true;
+      }
+      if (road.damaged !== true) {
+        road.damaged = true;
+        changed = true;
+      }
+    }
   }
 
   for (const segment of village.wall.segments) {
     if (segment.destroyed === true && segment.rebuildProgress !== 0) {
       segment.rebuildProgress = 0;
       changed = true;
+    }
+    if (segment.health !== undefined && segment.health <= 0) {
+      if (segment.health !== 0) {
+        segment.health = 0;
+        changed = true;
+      }
+      if (segment.destroyed !== true) {
+        segment.destroyed = true;
+        changed = true;
+      }
     }
   }
 
@@ -344,6 +369,22 @@ const damageHouse = (house: House, damage: number): boolean => {
   house.health = Math.max(0, houseHealth(house) - damage);
   house.rebuildProgress = house.health / 100;
   if (house.health === 0) house.destroyed = true;
+  return true;
+};
+
+const damageRoad = (road: Road, damage: number): boolean => {
+  if (roadHealth(road) <= 0) return false;
+  road.health = Math.max(0, roadHealth(road) - damage);
+  road.rebuildProgress = road.health / 100;
+  road.damaged = true;
+  return true;
+};
+
+const damageWallSegment = (segment: WallSegment, damage: number): boolean => {
+  if (segment.destroyed === true || wallSegmentHealth(segment) <= 0) return false;
+  segment.health = Math.max(0, wallSegmentHealth(segment) - damage);
+  segment.rebuildProgress = segment.health / 100;
+  if (segment.health === 0) segment.destroyed = true;
   return true;
 };
 
@@ -1089,7 +1130,7 @@ const updatePlague = (
   return { changed: changed || sicknessChanged, units: sicknessChanged, pairChecks };
 };
 
-const damageBurningHouses = (world: WorldState): boolean => {
+const damageBurningStructures = (world: WorldState): boolean => {
   const village = world.activeVillage;
   if (village === null) return false;
   let changed = false;
@@ -1098,6 +1139,21 @@ const damageBurningHouses = (world: WorldState): boolean => {
     const burning = world.fires.some((fire) =>
       fire.intensity > 0 && distance(fire.position, targetHouse.position) <= CELL_SIZE);
     if (burning) changed = damageHouse(targetHouse, FIRE_DAMAGE_PER_TICK) || changed;
+  }
+  for (const road of village.roads) {
+    const burning = road.points.some((point, index) =>
+      world.fires.some((fire) =>
+        fire.intensity > 0 && distance(fire.position, point) <= CELL_SIZE)
+      || (index > 0 && world.fires.some((fire) =>
+        fire.intensity > 0
+        && pointSegmentDistance(fire.position, road.points[index - 1]!, point) <= CELL_SIZE)));
+    if (burning) changed = damageRoad(road, FIRE_DAMAGE_PER_TICK) || changed;
+  }
+  for (const segment of village.wall.segments) {
+    const burning = world.fires.some((fire) =>
+      fire.intensity > 0
+      && pointSegmentDistance(fire.position, segment.start, segment.end) <= CELL_SIZE);
+    if (burning) changed = damageWallSegment(segment, FIRE_DAMAGE_PER_TICK) || changed;
   }
   return changed;
 };
@@ -1461,7 +1517,7 @@ export const updateDisasters = (
     world,
     world.pits.filter((pit) => activeEarthquakeIds.has(pit.eventId)),
   ) || outcome.unitChanged;
-  outcome.structureChanged = damageBurningHouses(world) || outcome.structureChanged;
+  outcome.structureChanged = damageBurningStructures(world) || outcome.structureChanged;
   outcome.hazardChanged = resolveUntrappedEarthquakes(world) || outcome.hazardChanged;
   for (const event of world.events) {
     if (statusesBefore.get(event.id) === "active" && event.status === "resolved") {
