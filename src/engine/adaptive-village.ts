@@ -835,15 +835,3 @@ export const createTerrainFirstVillageAttempt = (
     failure: null,
   };
 };
-
-export const createTerrainFirstVillage = (
-  world: WorldState,
-  anchor: Point,
-  seed: number,
-): VillageState | null => createTerrainFirstVillageAttempt(world, anchor, seed).village;
-
-export const TERRAIN_FIRST_LIMITS = Object.freeze({
-  minimumHouses: MINIMUM_HOUSES,
-  targetHouses: TARGET_HOUSES,
-  searchRadiusCells: SEARCH_RADIUS_CELLS,
-});
