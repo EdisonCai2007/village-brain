@@ -7,7 +7,6 @@
     "dev": "vite",
     "dev:server": "tsx watch server/index.ts",
     "build": "tsc -b && vite build",
-    "pipeline:village": "tsx devtools/adaptive-village/run.ts",
     "start": "NODE_ENV=production tsx server/index.ts",
     "typecheck": "tsc -b --pretty false",
     "test": "vitest",
@@ -16,7 +15,6 @@
   "dependencies": {
     "@langchain/core": "^1.2.8",
     "@langchain/google": "^0.2.2",
-    "@pixi/react": "^8.0.3",
     "pixi.js": "^8.19.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",

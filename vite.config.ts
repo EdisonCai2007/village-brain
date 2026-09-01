@@ -14,7 +14,6 @@ export default defineConfig({
     include: ["src/**/*.test.{ts,tsx}", "server/**/*.test.ts"],
     exclude: [
       "**/.superpowers/**",
-      "**/mockup/**",
       "**/node_modules/**",
       "**/dist/**",
     ],

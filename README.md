@@ -51,6 +51,7 @@ npm run build && npm start
 ```
 
 Open `http://127.0.0.1:8787`. Health status is available at `http://127.0.0.1:8787/api/health`; it reports whether the planner is configured without exposing credentials.
+The current `start` script runs the TypeScript server through `tsx`, so a deployment that uses `npm start` must install devDependencies (or compile `server/index.ts` as part of its release process).
 
 ## Controls
 
@@ -64,7 +65,6 @@ Open `http://127.0.0.1:8787`. Health status is available at `http://127.0.0.1:87
 | Trigger bandits | Choose **Bandits** or press `6`, then click land |
 | Trigger earthquake | Choose **Earthquake** or press `7`, then click land |
 | Trigger plague | Choose **Plague** or press `8`, then click near living villagers |
-| Inspect | Choose **Inspect** or press `I` |
 | Pan | Choose **Pan** or press `H`; Space-drag or middle-drag also pans |
 | Zoom | Mouse wheel over the map |
 | Pause / resume | Pause control or `Space` when focus is not in a form control |
@@ -97,7 +97,6 @@ The critical rule is one-way: the planner chooses strategy; the deterministic en
 npm run test:run
 npm run typecheck
 npm run build
-node --test mockup/village-generation.test.mjs
 ```
 
 The final browser and process audit is recorded in `artifacts/product-verification/final-evaluation.md`.
