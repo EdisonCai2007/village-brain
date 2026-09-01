@@ -1,0 +1,158 @@
+.decision-notifications {
+  position: absolute;
+  top: max(12px, env(safe-area-inset-top));
+  right: max(12px, env(safe-area-inset-right));
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: clamp(280px, 30vw, 380px);
+  max-height: min(420px, calc(100vh - max(12px, env(safe-area-inset-top)) - 16px));
+  padding: 0 6px 72px 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  pointer-events: auto;
+  scrollbar-color: color-mix(in srgb, var(--toolkit-ink) 38%, transparent) transparent;
+  scrollbar-width: thin;
+  -webkit-mask-image: linear-gradient(to bottom, var(--paper-light) 0%, var(--paper-light) calc(100% - 72px), transparent 100%);
+  mask-image: linear-gradient(to bottom, var(--paper-light) 0%, var(--paper-light) calc(100% - 72px), transparent 100%);
+}
+
+.decision-notifications::-webkit-scrollbar {
+  width: 6px;
+}
+
+.decision-notifications::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.decision-notifications::-webkit-scrollbar-thumb {
+  border-radius: var(--radius-control);
+  background: color-mix(in srgb, var(--toolkit-ink) 34%, transparent);
+}
+
+.decision-notifications:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.decision-notification {
+  position: relative;
+  padding: 12px 13px 13px 14px;
+  border: 1px solid color-mix(in srgb, var(--paper-light) 42%, transparent);
+  border-left: 1px solid var(--monument);
+  border-radius: var(--radius-map);
+  color: var(--toolkit-ink);
+  background: color-mix(in srgb, var(--chrome-deep) 94%, transparent);
+  box-shadow: 0 18px 30px rgba(24, 14, 8, 0.42);
+  backdrop-filter: blur(10px);
+  animation: decision-notification-shift-down 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.decision-notification:first-child {
+  animation-name: decision-notification-enter;
+}
+
+.decision-notification::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 11px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--monument);
+  box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 8%, transparent);
+}
+
+.decision-notification--observation::before,
+.decision-notification--observation { border-left-color: var(--water); }
+.decision-notification--planning,
+.decision-notification--plan { border-left-color: var(--monument); }
+.decision-notification--execution { border-left-color: var(--ember); }
+.decision-notification--outcome { border-left-color: var(--success); }
+.decision-notification--fallback,
+.decision-notification--error { border-left-color: var(--fire); }
+
+.decision-notification--observation::before { background: var(--water); }
+.decision-notification--planning::before,
+.decision-notification--plan::before { background: var(--monument); }
+.decision-notification--execution::before { background: var(--ember); }
+.decision-notification--outcome::before { background: var(--success); }
+.decision-notification--fallback::before,
+.decision-notification--error::before { background: var(--fire); }
+
+.decision-notification__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-left: 15px;
+  color: color-mix(in srgb, var(--toolkit-ink) 86%, transparent);
+  font-size: 0.69rem;
+  font-weight: 780;
+  line-height: 1.2;
+}
+
+.decision-notification__meta time {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.decision-notification p {
+  margin-top: 7px;
+  color: var(--paper-light);
+  font-size: 0.9rem;
+  font-weight: 720;
+  line-height: 1.42;
+  overflow-wrap: break-word;
+}
+
+@keyframes decision-notification-enter {
+  from {
+    opacity: 0;
+    transform: translateX(36px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes decision-notification-shift-down {
+  from {
+    opacity: 0.92;
+    transform: translateY(-18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 620px) {
+  .decision-notifications {
+    top: max(8px, env(safe-area-inset-top));
+    right: max(8px, env(safe-area-inset-right));
+    width: min(290px, calc(100vw - 74px));
+    max-height: min(328px, calc(100vh - max(8px, env(safe-area-inset-top)) - 12px));
+    padding-bottom: 64px;
+    gap: 7px;
+  }
+
+  .decision-notification {
+    padding: 11px 12px 12px 13px;
+  }
+
+  .decision-notification p {
+    font-size: 0.84rem;
+    line-height: 1.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .decision-notification {
+    animation: none;
+  }
+}

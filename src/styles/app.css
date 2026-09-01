@@ -1,0 +1,164 @@
+body {
+  overflow: hidden;
+  background: var(--desk);
+  color: var(--ink);
+}
+
+.app-shell {
+  min-height: 100vh;
+  background: var(--desk);
+}
+
+.workspace {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.tutorial-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.tutorial-spotlight {
+  position: fixed;
+  border: 2px solid var(--paper-light);
+  border-radius: var(--radius-map);
+  box-shadow: 0 0 0 100vmax rgba(19, 13, 9, 0.7), 0 0 0 5px rgba(245, 241, 223, 0.2);
+  pointer-events: none;
+}
+
+.tutorial-connector {
+  position: fixed;
+  height: 2px;
+  transform-origin: 0 50%;
+  background: var(--paper-light);
+  box-shadow: 0 0 0 1px rgba(19, 13, 9, 0.18);
+  pointer-events: none;
+}
+
+.tutorial-card {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  min-height: 212px;
+  padding: 20px 20px 18px;
+  border: 1px solid var(--toolkit-separator);
+  border-radius: var(--radius-card);
+  color: var(--monument-inset);
+  background: var(--toolkit-raised);
+  box-shadow: 0 22px 58px rgba(19, 13, 9, 0.42);
+  pointer-events: auto;
+}
+
+.tutorial-card--standalone {
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  width: min(348px, calc(100vw - 32px));
+}
+
+.tutorial-card__title { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(1.35rem, 2.6vw, 1.8rem); line-height: 1.05; }
+.tutorial-card__title:focus { outline: 3px solid var(--monument-inset); outline-offset: 4px; }
+.tutorial-card__description { margin-top: 9px; color: var(--monument-inset); font-size: 0.9rem; line-height: 1.48; }
+.tutorial-card__actions { margin-top: auto; padding-top: 20px; display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
+.tutorial-card__next, .tutorial-card__skip { min-height: 44px; border-radius: var(--radius-control); font-size: 0.82rem; font-weight: 800; cursor: pointer; }
+.tutorial-card__next { padding: 9px 19px; color: var(--toolkit-active-ink); background: var(--monument-inset); border: 1px solid var(--monument-inset); }
+.tutorial-card__next:hover:not(:disabled) { background: var(--toolkit-ink); border-color: var(--toolkit-ink); }
+.tutorial-card__next:disabled { cursor: not-allowed; opacity: 0.42; }
+.tutorial-card__skip { padding: 9px 8px; color: var(--monument-inset); background: transparent; border: 1px solid transparent; }
+.tutorial-card__skip:hover { color: var(--toolkit-ink); border-color: var(--toolkit-separator); }
+.tutorial-card__next:focus-visible, .tutorial-card__skip:focus-visible { outline: 3px solid var(--monument-inset); outline-offset: 2px; }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  border: 0;
+  white-space: nowrap;
+}
+
+.world-panel {
+  position: absolute;
+  inset: 0;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.world-frame {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  background: transparent;
+}
+.world-canvas-host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  background: transparent;
+}
+.world-canvas-host canvas { display: block; width: 100%; height: 100%; background: transparent; }
+.world-state {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 7px;
+  padding: 28px;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--paper) 72%, transparent);
+  text-align: center;
+}
+
+.world-state__spinner {
+  width: 38px;
+  height: 38px;
+  border: 4px solid var(--outline-soft);
+  border-top-color: var(--chrome);
+  border-radius: 50%;
+  animation: world-spin 900ms linear infinite;
+}
+.world-state__error-mark {
+  width: 44px;
+  height: 44px;
+  position: relative;
+  display: grid;
+  place-items: center;
+  color: var(--paper-light);
+  background: var(--danger);
+  border-radius: 50%;
+}
+.world-state__error-mark::before,
+.world-state__error-mark::after {
+  content: "";
+  position: absolute;
+  width: 22px;
+  height: 4px;
+  border-radius: var(--radius-control);
+  background: currentColor;
+}
+.world-state__error-mark::before { transform: rotate(45deg); }
+.world-state__error-mark::after { transform: rotate(-45deg); }
+
+@keyframes world-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+}
+
+@media (max-width: 620px) {
+  .tutorial-card { min-height: 0; padding: 16px; }
+  .tutorial-card__description { font-size: 0.84rem; }
+  .tutorial-card__actions { margin-top: 15px; padding-top: 0; }
+}

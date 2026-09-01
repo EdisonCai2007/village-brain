@@ -1,0 +1,237 @@
+.tool-rail {
+  position: absolute;
+  left: max(12px, env(safe-area-inset-left));
+  top: max(12px, env(safe-area-inset-top));
+  z-index: 2;
+  display: grid;
+  gap: 8px;
+  max-height: calc(100vh - max(12px, env(safe-area-inset-top)) - 12px);
+  pointer-events: none;
+  color: var(--toolkit-ink);
+}
+.tool-rail__scroll,
+.tool-rail__settings {
+  pointer-events: auto;
+  width: max-content;
+  padding: 6px;
+  display: grid;
+  gap: 5px;
+  border-radius: var(--radius-map);
+  background: var(--toolkit);
+  box-shadow: 0 16px 28px var(--toolkit-shadow);
+  backdrop-filter: blur(8px);
+}
+.tool-rail__scroll {
+  max-height: min-content;
+  overflow: visible;
+}
+.tool-group + .tool-group { margin-top: 5px; padding-top: 5px; border-top: 1px solid var(--toolkit-separator); }
+.tool-group__items { display: grid; gap: 5px; }
+.tool-button {
+  width: 44px;
+  height: 44px;
+  position: relative;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.tool-button:hover { background: var(--toolkit-hover); }
+.tool-button[aria-pressed="true"] { color: var(--toolkit-active-ink); background: var(--paper-light); box-shadow: 0 5px 12px var(--toolkit-active-shadow); }
+.tool-button:disabled { cursor: not-allowed; opacity: 0.52; }
+.tool-button__icon {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.tool-button__tooltip,
+.utility-button__tooltip,
+.brush-control__tooltip {
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: max-content;
+  max-width: 180px;
+  padding: 7px 9px;
+  border-radius: var(--radius-control);
+  color: var(--toolkit-ink);
+  background: var(--tooltip-bg);
+  box-shadow: 0 10px 22px var(--tooltip-shadow);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.1;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(0, -50%) scale(0.98);
+  transform-origin: left center;
+  transition:
+    opacity 120ms ease-out 500ms,
+    transform 120ms ease-out 500ms;
+}
+.tool-button__tooltip::before,
+.utility-button__tooltip::before,
+.brush-control__tooltip::before {
+  content: "";
+  position: absolute;
+  left: -5px;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  background: inherit;
+  transform: translateY(-50%) rotate(45deg);
+}
+.tool-button__tooltip kbd,
+.utility-button__tooltip kbd {
+  min-width: 18px;
+  padding: 2px 5px;
+  border-radius: var(--radius-control);
+  color: var(--toolkit-active-ink);
+  background: var(--paper-light);
+  font: inherit;
+  font-size: 11px;
+  text-align: center;
+}
+.tool-button:hover .tool-button__tooltip,
+.tool-button:focus-visible .tool-button__tooltip,
+.utility-button:hover .utility-button__tooltip,
+.utility-button:focus-visible .utility-button__tooltip,
+.brush-control:hover .brush-control__tooltip,
+.brush-control:focus-within .brush-control__tooltip {
+  opacity: 1;
+  transform: translate(0, -50%) scale(1);
+}
+.tool-rail__settings {
+  align-items: center;
+  overflow: visible;
+}
+.brush-control {
+  width: 44px;
+  min-height: 118px;
+  position: relative;
+  padding: 7px 0;
+  display: grid;
+  grid-template-rows: 20px 12px 76px;
+  justify-items: center;
+  gap: 6px;
+  color: inherit;
+}
+.brush-control__icon {
+  width: 21px;
+  height: 21px;
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.brush-control__stroke {
+  width: 20px;
+  height: var(--brush-preview);
+  align-self: center;
+  border-radius: var(--radius-control);
+  background: currentColor;
+}
+.brush-control input {
+  width: 20px;
+  height: 76px;
+  margin: 0;
+  align-self: center;
+  accent-color: var(--paper-light);
+  cursor: pointer;
+  writing-mode: vertical-lr;
+  direction: rtl;
+}
+.utility-button {
+  width: 44px;
+  height: 44px;
+  position: relative;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.utility-button:hover { background: var(--toolkit-hover); }
+.utility-button:disabled { cursor: not-allowed; opacity: 0.52; }
+.utility-button--danger { color: var(--danger-soft); }
+.utility-button--danger[data-armed="true"] { color: var(--paper-light); background: var(--danger); }
+.utility-button--tutorial { color: var(--toolkit-ink); }
+.tutorial-replay-mark { width: 22px; height: 22px; display: grid; place-items: center; border: 1.5px solid currentColor; border-radius: 50%; font-size: 0.78rem; font-weight: 850; line-height: 1; }
+.utility-button__icon {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+button:focus-visible, summary:focus-visible, input:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+@media (max-height: 700px) {
+  .tool-rail__scroll {
+    max-height: calc(100vh - 176px);
+    overflow-y: auto;
+  }
+
+  .brush-control {
+    min-height: 102px;
+    grid-template-rows: 20px 10px 60px;
+  }
+
+  .brush-control input {
+    height: 60px;
+  }
+}
+
+@media (max-width: 520px) {
+  .tool-rail {
+    left: max(8px, env(safe-area-inset-left));
+    top: max(8px, env(safe-area-inset-top));
+    gap: 7px;
+  }
+  .tool-rail__scroll,
+  .tool-rail__settings {
+    width: 48px;
+    padding: 5px;
+    gap: 4px;
+  }
+  .tool-group + .tool-group { margin-top: 5px; padding-top: 5px; }
+  .tool-group__items { gap: 4px; }
+  .tool-button,
+  .utility-button {
+    width: 38px;
+    height: 38px;
+  }
+  .tool-button__icon,
+  .utility-button__icon {
+    width: 20px;
+    height: 20px;
+  }
+  .brush-control {
+    width: 38px;
+    min-height: 98px;
+    padding-block: 6px;
+    grid-template-rows: 18px 8px 58px;
+    gap: 5px;
+  }
+  .brush-control__icon {
+    width: 19px;
+    height: 19px;
+  }
+  .brush-control__stroke { width: 20px; }
+  .brush-control input { height: 58px; }
+}
