@@ -8,7 +8,7 @@ This document is intentionally a planning brief, not an implementation plan. The
 
 ## Current Context
 
-Village Brain currently opens directly into the live sandbox experience. The existing first-run guidance is a compact onboarding hint that says:
+Village Brain now boots into an ocean-only live sandbox and presents the implemented World Boot tutorial overlay from `src/ui/WorldBootTutorial.tsx`. The compact onboarding hint below records the pre-implementation state that this work replaced:
 
 > Shape the story: Paint -> place the marker -> trigger a disaster -> inspect the chief's plan.
 
@@ -23,7 +23,7 @@ The tutorial should explain the essential loop:
 - Paint land and water.
 - Place the village marker.
 - Trigger or observe a disaster.
-- Inspect the chief's plan and timeline.
+- Inspect the chief's plan in the floating notification board.
 - Continue shaping the simulation after the tutorial ends.
 
 The tutorial is an overlay on top of the existing interface, not a separate route or landing page.
@@ -103,7 +103,7 @@ The tutorial should use a full-screen dimming overlay above the current user int
    - Progression: continue after the bandit event exists.
 
 8. **Watch Village Brain work**
-   - Target: chief plan/timeline area.
+   - Target: floating chief notification board.
    - Copy direction: tell the user to watch Village Brain plan and respond.
    - Action: user clicks `Next`.
 
@@ -120,7 +120,7 @@ The initial flow should prioritize the essential first-play path. Later steps ca
 - Water brush: paint water back into land.
 - Pause/resume: stop or continue simulation time.
 - Brush size: change terrain painting radius.
-- Timeline inspection: read why the chief chose a plan.
+- Notification inspection: read why the chief chose a plan.
 - Reset: return to a new ocean-only start.
 
 ## Questions To Resolve
@@ -138,7 +138,7 @@ Once the desired flow is specified, create an implementation plan under `docs/su
 - Ocean-only startup state and tutorial persistence.
 - Tutorial step model and progression rules.
 - Full-screen dimming overlay, spotlight/cutout positioning, outline, connector line, and text box placement.
-- Single-control, map-area, timeline-area, and entire-toolbar spotlight targets.
+- Single-control, map-area, notification-board, and entire-toolbar spotlight targets.
 - UI surfaces, highlights, keyboard behavior, focus management, and accessibility behavior.
-- Integration with existing controls, world commands, and timeline.
+- Integration with existing controls, world commands, and notifications.
 - Tests for first-run behavior, step progression, skip/finish behavior, and non-regression of normal sandbox startup.

@@ -1,16 +1,18 @@
 # Village Brain Interactive Sandbox Implementation Plan
 
+> Status: Completed historical plan. The final release keeps the typed React/PixiJS runtime and Node planner server; the preserved mockup, temporary pipeline, status bar, entity inspector, and onboarding hint mentioned in earlier steps were not retained.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Build the complete local Village Brain sandbox with live terrain editing, deterministic village simulation, five player-triggered disasters, PixiJS rendering, and a transparent server-side Gemini planner.
 
-**Architecture:** Preserve `mockup/` as the visual and geometry reference while adding a typed Vite/React application in `src/` and a lightweight Node planner server in `server/`. A pure fixed-step engine owns world mechanics; PixiJS renders immutable read models; React owns controls and panels; LangChain Gemini returns only Zod-validated strategic intents.
+**Architecture:** Use the former `mockup/` as the visual and geometry reference while building a typed Vite/React application in `src/` and a lightweight Node planner server in `server/`. A pure fixed-step engine owns world mechanics; PixiJS renders immutable read models; React owns controls and panels; LangChain Gemini returns only Zod-validated strategic intents.
 
 **Tech Stack:** Node 24, npm, React 19, TypeScript 7, Vite 8, PixiJS 8, Vitest 4, Zod 4, LangChain `@langchain/google`, Node HTTP server.
 
 ## Global Constraints
 
-- Keep `mockup/` and `artifacts/` intact as reference evidence.
+- Keep reference artifacts intact during development; the standalone `mockup/` is not part of the final release tree.
 - Use a logical 128×86 terrain grid mapped to a 1280×860 world.
 - Advance canonical simulation state in deterministic 100 ms ticks outside React.
 - Cap animation catch-up at five ticks per frame and cap every search/placement loop explicitly.

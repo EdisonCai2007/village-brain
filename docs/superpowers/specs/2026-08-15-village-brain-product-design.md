@@ -1,5 +1,7 @@
 # Village Brain Interactive Sandbox Design
 
+> Status: Historical implementation brief. The final runtime is the React/PixiJS app in `src/` plus the Node server in `server/`; the prototype, entity inspector, status bar, and adaptive-generation pipeline referenced in this document are not part of the release source.
+
 ## Goal
 
 Turn the existing static Canvas village-generation proof into the complete interactive Village Brain product described by `PRODUCT.md`, `DESIGN.md`, and `AI_SIMULATION_PROMPT.md`. The finished local web app lets a player paint land and water, place a deterministic village, trigger five disasters, pause and navigate the world, and understand an AI chief's strategic response through a transparent timeline. The AI chooses high-level intents only; deterministic code owns selection, pathing, movement, damage, and resolution.
@@ -13,7 +15,7 @@ The implementation resolves the prompt's remaining questions as follows:
 - All simulation randomness and village generation derive from a visible integer seed.
 - Terrain remains editable while the simulation is live. Painting water under an occupied object relocates that object to the nearest valid land cell when possible; otherwise the object is removed through a logged deterministic terrain consequence.
 - A lightweight Node HTTP server serves the production app and the planner endpoint. Vite provides frontend development and proxies `/api` locally.
-- Gemini is configured through `GEMINI_MODEL`, defaulting to `gemini-2.5-flash-lite`; the provider remains replaceable behind one interface.
+- Gemini is configured through `GEMINI_MODEL`, defaulting to `gemini-3.5-flash-lite`; the provider remains replaceable behind one interface.
 - Disaster tools use fixed, documented defaults in the first version. The tool rail explains the active default instead of exposing tuning controls.
 - No start button exists. The fixed-step engine is live immediately; placing a totem creates or replaces the active village.
 
@@ -21,7 +23,7 @@ The implementation resolves the prompt's remaining questions as follows:
 
 ### 1. Extend the existing Canvas prototype directly
 
-This would add controls and mechanics to `mockup/village-scene.js`. It has the smallest initial diff, but the file already mixes scene setup, drawing primitives, URL state, and generated layout rendering. Adding live state, input, planner calls, and simulation logic would erase the module boundaries required by the product.
+This was the smallest initial diff, but the former `mockup/village-scene.js` mixed scene setup, drawing primitives, URL state, and generated layout rendering. Adding live state, input, planner calls, and simulation logic there would have erased the module boundaries required by the product.
 
 ### 2. Build the full app and discard the prototype
 
@@ -29,7 +31,7 @@ This gives a clean TypeScript architecture but risks losing the seed-tested vill
 
 ### 3. Progressive typed replacement (selected)
 
-Build the complete React, TypeScript, PixiJS, and Node application alongside the preserved `mockup/` reference. Port the generator's structural rules and the scene's palette/drawing language into focused typed modules. Keep the original proof and evaluation artifacts as comparison evidence. This provides clean production boundaries while retaining the best existing work.
+Build the complete React, TypeScript, PixiJS, and Node application alongside the former mockup as a temporary reference. Port the generator's structural rules and the scene's palette/drawing language into focused typed modules. Keep the original proof and evaluation artifacts as comparison evidence. This provides clean production boundaries while retaining the best existing work; the temporary mockup is removed after the production implementation is established.
 
 ## Runtime Architecture
 
@@ -109,7 +111,7 @@ PixiJS renders the world in layers: water/background, land/shore, derived paths 
 
 The renderer ports the approved tokens and shapes from `DESIGN.md`: calm natural colors, brown-gray outlines, rounded terrain, upright front-facing houses, silhouette villagers, connected top-down walls, an opaque obelisk-like village marker, ground-plane fire, and a flat curved tsunami front. Repeated state uses consistent colors. Status changes use small rings, icons, or route lines rather than random asset recoloring.
 
-The existing static `mockup/` and saved screenshots remain untouched as visual reference. The new app does not depend on them at runtime.
+The saved screenshots and product-verification evidence remain as visual reference. The former static `mockup/` is not part of the release tree, and the app does not depend on it at runtime.
 
 ## Error Handling and Safety
 

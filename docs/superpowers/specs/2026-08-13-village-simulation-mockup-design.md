@@ -1,5 +1,7 @@
 # Village Simulation Mockup Design
 
+> Status: Superseded historical mockup specification. The standalone `mockup/` prototype described here was development-only and has been removed; the release implementation is the React/PixiJS app in `src/`.
+
 ## Goal
 
 Create a static local web mockup that shows what the Village Brain project could look like once the simulation is running. The mockup should feel like a paused frame from the actual sandbox rather than a marketing page or final game screen.

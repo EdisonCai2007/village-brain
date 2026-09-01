@@ -93,7 +93,7 @@ The palette is natural and moderately colorful. Grass, water, path dirt, wood, r
 
 The interactive app uses a full-viewport transparent canvas over the desk. The floating toolbar sits over the desk and should stay compact, with icon-first controls and delayed custom tooltips. There are no visible labels or debug overlays inside the game scene; controls live in the toolkit layer.
 
-The element library sits below the scene so the main artwork stays large. Each tile uses an individual canvas that calls the same drawing functions as the scene, with small HTML captions outside the canvas.
+The application keeps the world artwork full-viewport. The tool rail, notification board, and tutorial are HTML surfaces layered around the Pixi canvas, leaving the scene itself free of interface text.
 
 ## Shape And Depth
 
@@ -107,6 +107,6 @@ Terrain uses smooth organic blobs. Icon assets use circles, rounded rectangles, 
 - Keep fire visually part of the ground plane, and keep tsunami as a flat moving front rather than a raised wave icon.
 
 ### Don't
-- Don't add text or interface elements inside the mockup artwork.
+- Don't add text or interface elements inside the world artwork.
 - Don't use isometric angle, visible building side walls, or realistic perspective.
 - Don't rely on texture, glow, atmospheric haze, or heavy shadows for polish.

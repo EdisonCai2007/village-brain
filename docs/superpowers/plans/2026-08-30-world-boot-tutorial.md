@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Turn the existing direct-to-sandbox startup into a complete, persistent nine-step World Boot tutorial that teaches the live terrain, village, bandit, and chief-timeline loop without replacing the real controls.
+**Goal:** Turn the existing direct-to-sandbox startup into a complete, persistent nine-step World Boot tutorial that teaches the live terrain, village, bandit, and chief-notification loop without replacing the real controls.
 
-**Architecture:** Keep tutorial progression in a small pure state-machine module driven by the existing `SimulationSnapshot`; React owns only the current step and local persistence. Render a fixed instructional overlay with a DOM-measured spotlight and connector, while leaving the actual tool rail, Pixi canvas, and timeline mounted and interactive beneath it. Make ocean-only startup an explicit `VillageEngine` mode so the browser experience changes without weakening the generated-world engine fixtures and deterministic tests.
+**Architecture:** Keep tutorial progression in a small pure state-machine module driven by the existing `SimulationSnapshot`; React owns only the current step and local persistence. Render a fixed instructional overlay with a DOM-measured spotlight and connector, while leaving the actual tool rail, Pixi canvas, and floating notification board mounted and interactive beneath it. Make ocean-only startup an explicit `VillageEngine` mode so the browser experience changes without weakening the generated-world engine fixtures and deterministic tests.
 
 **Tech Stack:** React 19, TypeScript, Vite, PixiJS 8, Vitest, browser-client/agent-browser for live verification.
 
@@ -86,7 +86,7 @@ export type TutorialStepId =
   | "watch-chief" | "try-tools";
 ```
 
-Each step contains a title, concise description, `target` (`"world" | "land" | "totem" | "bandits" | "timeline" | "toolbar"`), and action kind. `welcome`, `watch-chief`, and `try-tools` advance on Next; selection steps advance when `activeTool` matches; map steps advance only when `hasLand`, `hasVillage`, or `hasBanditEvent` is true. `nextTutorialStep` must return the same step when its action is incomplete and `null` after `try-tools`.
+Each step contains a title, concise description, `target` (`"world" | "land" | "totem" | "bandits" | "notifications" | "toolbar"`), and action kind. `welcome`, `watch-chief`, and `try-tools` advance on Next; selection steps advance when `activeTool` matches; map steps advance only when `hasLand`, `hasVillage`, or `hasBanditEvent` is true. `nextTutorialStep` must return the same step when its action is incomplete and `null` after `try-tools`.
 
 - [ ] **Step 5: Run the focused tests and verify they pass.**
 
@@ -103,19 +103,18 @@ Expected: PASS, with the pre-existing generated-world assertions still green.
 - Modify: `src/App.tsx`
 - Modify: `src/ui/ToolRail.tsx`
 - Modify: `src/ui/WorldViewport.tsx`
-- Modify: `src/ui/Timeline.tsx`
+- Modify: `src/ui/DecisionNotifications.tsx`
 - Modify: `src/ui/App.test.tsx`
 - Create: `src/ui/WorldBootTutorial.test.tsx`
 - Modify: `src/styles/app.css`
 - Modify: `src/styles/controls.css`
-- Modify: `src/styles/timeline.css`
 - Modify: `src/styles/decision-notifications.css`
 
 **Interfaces:**
 - `WorldBootTutorial` receives `step`, `canAdvance`, `onNext`, and `onSkip`, and renders the instructional dialog/spotlight.
 - `ToolRail` accepts optional `onReplayTutorial?: () => void` and exposes `data-tutorial-target="toolbar"` plus per-tool target attributes.
 - `WorldViewport` exposes `data-tutorial-target="world"` and a keyboard-focusable map host.
-- `Timeline` exposes `data-tutorial-target="timeline"`.
+- `DecisionNotifications` exposes `data-tutorial-target="notifications"`.
 
 - [ ] **Step 1: Write failing semantic UI tests.**
 
@@ -131,13 +130,13 @@ it("renders the current step with an action-gated Next button", () => {
   expect(markup).toContain("Skip tutorial");
 });
 
-it("marks the actual controls and timeline as spotlight targets", () => {
+it("marks the actual controls and notification board as spotlight targets", () => {
   const markup = renderToStaticMarkup(<App controller={createDisconnectedController()} />);
   expect(markup).toContain('data-tutorial-target="toolbar"');
   expect(markup).toContain('data-tutorial-target="land"');
   expect(markup).toContain('data-tutorial-target="totem"');
   expect(markup).toContain('data-tutorial-target="bandits"');
-  expect(markup).toContain('data-tutorial-target="timeline"');
+  expect(markup).toContain('data-tutorial-target="notifications"');
 });
 ```
 
@@ -145,11 +144,11 @@ it("marks the actual controls and timeline as spotlight targets", () => {
 
 Run: `npm test -- --run src/ui/WorldBootTutorial.test.tsx src/ui/App.test.tsx --no-file-parallelism --maxWorkers=1`
 
-Expected: FAIL because the overlay, target attributes, and mounted timeline are missing.
+Expected: FAIL because the overlay, target attributes, and mounted notification board are missing.
 
-- [ ] **Step 3: Implement target attributes and mount the chief timeline.**
+- [ ] **Step 3: Implement target attributes and retain the existing chief notification board.**
 
-Add the target attributes to the actual rail, tool buttons, world frame/host, and `Timeline` aside. Render `<Timeline entries={snapshot.timeline} />` from `App` so the tutorial’s chief target is real. Add an unobtrusive `Replay tutorial` button to the rail settings or workspace chrome and keep it outside the Pixi artwork.
+Add the target attributes to the actual rail, tool buttons, world frame/host, and `DecisionNotifications` aside. Keep the existing floating notification board as the tutorial’s chief target; do not add a second full-height timeline panel. Add an unobtrusive `Replay tutorial` button to the rail settings or workspace chrome and keep it outside the Pixi artwork.
 
 - [ ] **Step 4: Implement the overlay’s geometry and interaction behavior.**
 
@@ -161,7 +160,7 @@ Add the target attributes to the actual rail, tool buttons, world frame/host, an
 4. Use a derived centered inset rectangle for the world target rather than spotlighting the entire viewport.
 5. Dim with a box-shadow cutout, outline the target, and draw a connector line from target edge toward the dialog.
 6. Place the dialog beside the target when space permits and below it otherwise, clamped to the viewport.
-7. Focus the heading on informational steps and focus the actual button/map/timeline target on action steps; add Escape-to-skip and respect `prefers-reduced-motion` in CSS.
+7. Focus the heading on informational steps and focus the actual button/map/notification target on action steps; add Escape-to-skip and respect `prefers-reduced-motion` in CSS.
 8. Mark the layer as a dialog with labelled/described content, keep Next disabled when `canAdvance` is false, and label the current progress for assistive technology.
 
 - [ ] **Step 5: Connect App progression, persistence, and replay.**
@@ -170,11 +169,11 @@ Initialize the tutorial in a browser only when `localStorage` does not contain `
 
 - [ ] **Step 6: Style the overlay and avoid desktop/mobile collisions.**
 
-Use existing brown/cream tokens, no gradients, and a high-contrast paper tutorial card. Keep the rail/timeline above the world but below the tutorial overlay. On narrow screens clamp the card to viewport width, keep action buttons at least 44px high, move timeline to a bottom panel, and shift notifications so they do not cover the timeline. Add only tutorial-specific CSS to the existing style files.
+Use existing brown/cream tokens, no gradients, and a high-contrast paper tutorial card. Keep the rail and floating notifications above the world but below the tutorial overlay. On narrow screens clamp the card to viewport width and keep action buttons at least 44px high. Add only tutorial-specific CSS to the existing style files.
 
 - [ ] **Step 7: Run the focused UI tests and typecheck.**
 
-Run: `npm test -- --run src/ui/WorldBootTutorial.test.tsx src/ui/App.test.tsx src/ui/ToolRail.test.tsx src/ui/Timeline.test.tsx --no-file-parallelism --maxWorkers=1`
+Run: `npm test -- --run src/ui/WorldBootTutorial.test.tsx src/ui/App.test.tsx src/ui/ToolRail.test.tsx src/ui/DecisionNotifications.test.tsx --no-file-parallelism --maxWorkers=1`
 
 Run: `npm run typecheck`
 
@@ -210,11 +209,11 @@ Use the browser verification skill immediately after the server starts: open the
 
 - [ ] **Step 3: Exercise the entire tutorial in the real browser.**
 
-Verify each visible title/description and target alignment. Click the real Land, Totem, and Bandits buttons; paint a clearly visible island in the central map; place the totem on the island; place bandits on valid land; verify the village/event/timeline DOM state changes; then finish. Confirm Skip and replay independently, and confirm local completion prevents the overlay on reload.
+Verify each visible title/description and target alignment. Click the real Land, Totem, and Bandits buttons; paint a clearly visible island in the central map; place the totem on the island; place bandits on valid land; verify the village/event/notification DOM state changes; then finish. Confirm Skip and replay independently, and confirm local completion prevents the overlay on reload.
 
 - [ ] **Step 4: Capture desktop and mobile evidence.**
 
-Save a desktop screenshot with the map target and one with the toolbar/timeline target, plus a narrow screenshot showing the card remains inside the viewport. Inspect the images rather than relying on DOM assertions. Record any overlap, misplaced spotlight, clipped copy, console error, or invalid action state in `world-boot-evaluation.md`.
+Save a desktop screenshot with the map target and one with the toolbar/notification target, plus a narrow screenshot showing the card remains inside the viewport. Inspect the images rather than relying on DOM assertions. Record any overlap, misplaced spotlight, clipped copy, console error, or invalid action state in `world-boot-evaluation.md`.
 
 - [ ] **Step 5: Fix each observed issue with a failing regression test first.**
 
@@ -223,4 +222,3 @@ For every issue found, reproduce it in a focused test or browser assertion, veri
 - [ ] **Step 6: Re-run the full audit before completion.**
 
 Run `npm run test:run`, `npm run typecheck`, and `npm run build` fresh. Reopen the browser, replay the complete tutorial once, inspect final desktop/mobile screenshots, confirm no orphaned dev server remains, and check CPU/process state. Compare the evidence line by line with every numbered step and boundary in `docs/superpowers/specs/2026-08-30-world-boot-tutorial-design.md`.
-

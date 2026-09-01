@@ -1,5 +1,7 @@
 # Organic Village Generation Design
 
+> Status: Completed historical specification. The standalone canvas mockup and generator described here were development-only; the retained terrain-first implementation lives in `src/engine/`.
+
 ## Goal
 
 Replace the fixed village arrangement in the local canvas mockup with a deterministic, seeded generator whose roads grow with the settlement, whose houses face and connect to those roads, whose bridges exist only at narrow river crossings, and whose wall follows the occupied core. Preserve the current flat painted art direction and keep the implementation dependency-free.

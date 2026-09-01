@@ -22,7 +22,7 @@ The main boundary is:
 - `engine`: Deterministic simulation loop, world state, villagers, events, disasters, movement, safety scoring, and intent execution.
 - `planner`: LangChain pipeline, model-provider adapter, event snapshot generation, JSON schema prompt, output validation, retry or fallback behavior.
 - `renderer`: PixiJS scene rendering, terrain painting display, villagers, structures, disasters, overlays, and animations.
-- `ui`: React controls for terrain tools, simulation start, disaster triggers, timeline, debug views, and planner status.
+- `ui`: React controls for terrain and disaster tools, the world-boot tutorial, notification board, and planner status.
 
 
 
@@ -291,4 +291,3 @@ Invalid planner output should be handled explicitly:
 - Log each AI plan in plain language alongside the raw validated intent for debugging.
 - Avoid LangGraph for the first version; a linear planner chain is enough until branching or long-running workflows are needed.
 - Keep the planner linear and debounced: collect events briefly, send one concise request, validate, execute, and log.
-

@@ -32,7 +32,7 @@ Terrain semantics should stay simple for the player: land and water are the firs
 
 ## Brand Commitments
 
-The working visual direction for the first mockup is a cinematic top-down simulation map: legible like a tool, but composed like a live strategy-board snapshot.
+The working visual direction for the application is a cinematic top-down simulation map: legible like a tool, but composed like a live strategy-board snapshot.
 
 ## Evidence on Hand
 

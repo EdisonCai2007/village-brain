@@ -1,5 +1,7 @@
 # Organic Village Generation Implementation Plan
 
+> Status: Completed historical plan. The standalone mockup and its generator tests were development-only and have been removed; current village generation lives in `src/engine/`.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Replace the fixed village arrangement with a deterministic street-first generator and verify road, bridge, wall, and organic-layout quality across multiple seeds.

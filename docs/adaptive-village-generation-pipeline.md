@@ -1,5 +1,7 @@
 # Adaptive Village Generation Pipeline Plan
 
+> Status: Completed historical development plan. The temporary pipeline, mockup, and generated corpus described here have been removed from the release source; the resulting terrain-first generator remains in `src/engine/`.
+
 ## Purpose
 
 The current village generator is too template-dependent. It succeeds only when the terrain happens to fit the generator's preferred construction shape. That is the wrong model for Village Brain because the user can draw arbitrary islands, rivers, shorelines, lakes, water pockets, and land shapes.
