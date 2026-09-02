@@ -23,6 +23,13 @@ body {
   pointer-events: none;
 }
 
+.tutorial-dim {
+  position: fixed;
+  inset: 0;
+  background: rgba(19, 13, 9, 0.7);
+  pointer-events: none;
+}
+
 .tutorial-spotlight {
   position: fixed;
   border: 2px solid var(--paper-light);

@@ -112,10 +112,23 @@ export function WorldBootTutorial({ step: stepId, canAdvance, onNext, onSkip }: 
     const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(updateLayout);
     const target = isWorldStep ? null : document.querySelector<HTMLElement>(`[data-tutorial-target="${step.target}"]`);
     if (target !== null) observer?.observe(target);
+    let mutationObserver: MutationObserver | null = null;
+    if (!isWorldStep && target === null && typeof MutationObserver !== "undefined") {
+      mutationObserver = new MutationObserver(() => {
+        updateLayout();
+        if (document.querySelector<HTMLElement>(`[data-tutorial-target="${step.target}"]`) !== null) {
+          mutationObserver?.disconnect();
+          mutationObserver = null;
+        }
+      });
+      const mutationRoot = document.querySelector<HTMLElement>(".workspace") ?? document.body;
+      if (mutationRoot !== null) mutationObserver.observe(mutationRoot, { childList: true, subtree: true });
+    }
     return () => {
       window.removeEventListener("resize", updateLayout);
       window.visualViewport?.removeEventListener("resize", updateLayout);
       observer?.disconnect();
+      mutationObserver?.disconnect();
     };
   }, [step.target]);
 
@@ -138,6 +151,7 @@ export function WorldBootTutorial({ step: stepId, canAdvance, onNext, onSkip }: 
   }, [onSkip, stepId]);
 
   const activeLayout = isWorldStep ? null : layout;
+  const isStandalone = activeLayout === null;
   const targetStyle: CSSProperties | undefined = activeLayout === null ? undefined : {
     left: activeLayout.target.left,
     top: activeLayout.target.top,
@@ -158,11 +172,12 @@ export function WorldBootTutorial({ step: stepId, canAdvance, onNext, onSkip }: 
   const isFinalStep = stepId === "try-tools";
 
   return (
-    <div className="tutorial-overlay" aria-label="World Boot tutorial">
-      {isWorldStep ? null : <div className="tutorial-spotlight" style={targetStyle} aria-hidden="true" />}
-      {isWorldStep ? null : <div className="tutorial-connector" style={connectorStyle} aria-hidden="true" />}
+    <div className={`tutorial-overlay${stepId === "welcome" ? " tutorial-overlay--welcome" : ""}`} aria-label="World Boot tutorial">
+      {stepId === "welcome" ? <div className="tutorial-dim" aria-hidden="true" /> : null}
+      {activeLayout === null ? null : <div className="tutorial-spotlight" style={targetStyle} aria-hidden="true" />}
+      {activeLayout === null ? null : <div className="tutorial-connector" style={connectorStyle} aria-hidden="true" />}
       <section
-        className={`tutorial-card${isWorldStep ? " tutorial-card--standalone" : ""}`}
+        className={`tutorial-card${isStandalone ? " tutorial-card--standalone" : ""}`}
         style={cardStyle}
         role="dialog"
         aria-modal="false"

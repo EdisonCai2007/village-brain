@@ -4,8 +4,27 @@ import { describe, expect, it, vi } from "vitest";
 import { WorldBootTutorial } from "./WorldBootTutorial";
 
 describe("WorldBootTutorial", () => {
-  it.each(["welcome", "draw-island", "place-village", "place-bandits"] as const)(
-    "renders the %s world step as an unhighlighted bottom-right card",
+  it("dims the full screen for the welcome step while keeping the card standalone",
+    () => {
+      const markup = renderToStaticMarkup(
+        <WorldBootTutorial
+          step="welcome"
+          canAdvance
+          onNext={vi.fn()}
+          onSkip={vi.fn()}
+        />,
+      );
+
+      expect(markup).toContain('class="tutorial-overlay tutorial-overlay--welcome"');
+      expect(markup).toContain('class="tutorial-dim"');
+      expect(markup).toContain('class="tutorial-card tutorial-card--standalone"');
+      expect(markup).not.toContain('class="tutorial-spotlight"');
+      expect(markup).not.toContain('class="tutorial-connector"');
+    },
+  );
+
+  it.each(["draw-island", "place-village", "place-bandits"] as const)(
+    "keeps the %s world step un-dimmed",
     (step) => {
       const markup = renderToStaticMarkup(
         <WorldBootTutorial
@@ -17,10 +36,27 @@ describe("WorldBootTutorial", () => {
       );
 
       expect(markup).toContain('class="tutorial-card tutorial-card--standalone"');
+      expect(markup).not.toContain('class="tutorial-overlay tutorial-overlay--welcome"');
+      expect(markup).not.toContain('class="tutorial-dim"');
       expect(markup).not.toContain('class="tutorial-spotlight"');
       expect(markup).not.toContain('class="tutorial-connector"');
     },
   );
+
+  it("keeps the watch-chief card anchored when notifications have not rendered yet", () => {
+    const markup = renderToStaticMarkup(
+      <WorldBootTutorial
+        step="watch-chief"
+        canAdvance
+        onNext={vi.fn()}
+        onSkip={vi.fn()}
+      />,
+    );
+
+    expect(markup).toContain('class="tutorial-card tutorial-card--standalone"');
+    expect(markup).not.toContain('class="tutorial-spotlight"');
+    expect(markup).not.toContain('class="tutorial-connector"');
+  });
 
   it("renders the current step with an action-gated Next button", () => {
     const markup = renderToStaticMarkup(
