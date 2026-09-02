@@ -219,8 +219,8 @@ if (isMain) {
     ? configuredPort
     : DEFAULT_PORT;
   const server = createVillageBrainServer();
-  server.listen(port, "127.0.0.1", () => {
-    console.log(`Village Brain server listening on http://127.0.0.1:${port}`);
+  server.listen(port, "0.0.0.0", () => {
+    console.log(`Village Brain server listening on http://0.0.0.0:${port}`);
     if (server.aiSessionLog !== undefined) {
       console.log(`AI session log: ${server.aiSessionLog.filePath}`);
     }
