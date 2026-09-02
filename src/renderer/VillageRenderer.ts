@@ -39,6 +39,9 @@ import {
   zoomCameraAt,
 } from "./interaction";
 import { palette } from "./palette";
+import {
+  getVillagerDeathAnimationFrame,
+} from "./villagerDeathAnimation";
 
 export interface RendererUiReadModel {
   readonly tool?: RendererTool | string;
@@ -85,6 +88,8 @@ type ActiveGesture = { readonly kind: "pan"; readonly value: PanGesture }
 interface UnitNode {
   readonly graphic: Graphics;
   readonly appearance: string;
+  readonly deathOrigin: Point | null;
+  readonly deathStartedAt: number | null;
 }
 
 interface EarthquakeBurst {
@@ -119,6 +124,7 @@ export class VillageRenderer {
   readonly #cache = new LayerRevisionCache();
   readonly #villagerNodes = new Map<string, UnitNode>();
   readonly #hostileNodes = new Map<string, UnitNode>();
+  readonly #completedVillagerDeaths = new Set<string>();
 
   #camera: CameraState = { x: 0, y: 0, scale: 1 };
   #world: WorldReadModel | null = null;
@@ -252,6 +258,7 @@ export class VillageRenderer {
     this.#cache.clear();
     this.#villagerNodes.clear();
     this.#hostileNodes.clear();
+    this.#completedVillagerDeaths.clear();
     this.#callbacks.onPreview?.(null);
   }
 
@@ -290,16 +297,34 @@ export class VillageRenderer {
       this.#unitsLayer.removeChild(node.graphic);
       node.graphic.destroy();
       this.#villagerNodes.delete(id);
+      this.#completedVillagerDeaths.delete(id);
     }
     for (const villager of world.villagers) {
       const appearance = `${villager.status ?? "idle"}`;
       let node = this.#villagerNodes.get(villager.id);
+      if (appearance !== "dead") this.#completedVillagerDeaths.delete(villager.id);
+      if (appearance === "dead" && this.#completedVillagerDeaths.has(villager.id)) {
+        if (node) {
+          this.#unitsLayer.removeChild(node.graphic);
+          node.graphic.destroy();
+          this.#villagerNodes.delete(villager.id);
+        }
+        continue;
+      }
       if (!node || node.appearance !== appearance) {
         if (node) {
           this.#unitsLayer.removeChild(node.graphic);
           node.graphic.destroy();
         }
-        node = { graphic: createVillagerGraphic(villager), appearance };
+        const startsDeathAnimation = villager.status === "dead"
+          && node !== undefined
+          && node.appearance !== "dead";
+        node = {
+          graphic: createVillagerGraphic(villager),
+          appearance,
+          deathOrigin: startsDeathAnimation ? { ...villager.position } : null,
+          deathStartedAt: startsDeathAnimation ? performance.now() : null,
+        };
         this.#villagerNodes.set(villager.id, node);
         this.#unitsLayer.addChild(node.graphic);
       }
@@ -316,7 +341,12 @@ export class VillageRenderer {
     for (const hostile of world.hostiles) {
       let node = this.#hostileNodes.get(hostile.id);
       if (!node) {
-        node = { graphic: createBanditGraphic(hostile), appearance: "bandit" };
+        node = {
+          graphic: createBanditGraphic(hostile),
+          appearance: "bandit",
+          deathOrigin: null,
+          deathStartedAt: null,
+        };
         this.#hostileNodes.set(hostile.id, node);
         this.#unitsLayer.addChild(node.graphic);
       }
@@ -522,9 +552,10 @@ export class VillageRenderer {
   }
 
   #onAnimationTick = (): void => {
+    const now = performance.now();
+    this.#animateVillagerDeaths(now);
     if (this.#earthquakeBursts.length === 0) return;
 
-    const now = performance.now();
     const activeBursts: EarthquakeBurst[] = [];
     let strongestShake = 0;
     this.#effectsGraphics.clear();
@@ -553,6 +584,20 @@ export class VillageRenderer {
     };
     this.#applyCameraTransform();
   };
+
+  #animateVillagerDeaths(now: number): void {
+    for (const [id, node] of this.#villagerNodes) {
+      if (node.deathStartedAt === null || node.deathOrigin === null) continue;
+      const frame = getVillagerDeathAnimationFrame(node.deathStartedAt, now);
+      node.graphic.position.set(node.deathOrigin.x, node.deathOrigin.y + frame.offsetY);
+      node.graphic.alpha = frame.alpha;
+      if (!frame.complete) continue;
+      this.#unitsLayer.removeChild(node.graphic);
+      node.graphic.destroy();
+      this.#villagerNodes.delete(id);
+      this.#completedVillagerDeaths.add(id);
+    }
+  }
 
   #capturePointer(pointerId: number): void {
     try {
